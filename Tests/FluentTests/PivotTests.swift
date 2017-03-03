@@ -11,6 +11,7 @@ class PivotTests: XCTestCase {
     }
 
     func testEntityAttach() throws {
+        print("HERE HERE")
         Pivot<Atom, Compound>.database = db
         let atom = Atom(name: "Hydrogen")
         atom.id = 42

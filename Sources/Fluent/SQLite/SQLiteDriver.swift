@@ -60,7 +60,7 @@ extension SQLiteDriverProtocol {
         }
 
         if let id = database.lastId, query.action == .create {
-            return try id.makeNode()
+            return id.makeNode(in: query.context)
         } else {
             return map(results: results)
         }
@@ -85,7 +85,7 @@ extension SQLiteDriverProtocol {
     /// Binds an array of values to the
     /// SQLite statement.
     func bind(statement: SQLite.Statement, to values: [Node]) throws {
-        for value in values {
+        for value in values.map({ $0.wrapped }) {
             switch value {
             case .number(let number):
                 switch number {
@@ -118,9 +118,9 @@ extension SQLiteDriverProtocol {
     /// Maps SQLite Results to Fluent results.
     func map(results: [SQLite.Result.Row]) -> Node {
         let res: [Node] = results.map { row in
-            var object: Node = .object([:])
+            var object: Node = .object([:], in: rowContext)
             for (key, value) in row.data {
-                object[key] = value.makeNode()
+                object[key] = value.makeNode(in: rowContext)
             }
             return object
         }
